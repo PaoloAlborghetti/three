@@ -43,18 +43,20 @@ scene.add(camera);
 
 // thre renderer
 const renderer = new WebGLRenderer({canvas});
-const pixelRat = Math.min(window.devicePixelRatio(),2);
+const pixelRat = Math.min(window.devicePixelRatio,2);
 renderer.setPixelRatio(pixelRat);
 renderer.setSize(canvas.clientWidth,canvas.clientHeight,false);
 //renderer.render(scene,camera);
 
 //set canvas size
 
-window.addEventListener('resize',()=>{
-    camera.aspect=canvas.clientWidth/canvas.clientHeight;
+window.addEventListener('resize', () => {
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
     camera.updateProjectionMatrix();
-    renderer.setSize(canvas.clientWidth,canvas.clientHeight,false);
-})
+    renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+});
+
+
 
 //animate
 
