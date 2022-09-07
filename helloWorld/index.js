@@ -3,11 +3,24 @@ import {
     BoxGeometry,
     MeshBasicMaterial,
     Mesh,
-    Camera,
     PerspectiveCamera,
-    WebGLRenderer
-    
+    WebGLRenderer,
+    Vector2,
+    Vector3,
+    Vector4,
+    Quaternion,
+    Matrix4,
+    Spherical,
+    Box3,
+    Sphere,
+    Raycaster,
+    MathUtils,
+    MOUSE,
+    Clock
 } from 'three';
+import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
+import CameraControls from 'camera-controls';
+
 
 //1 scene
 
@@ -29,7 +42,7 @@ bigOrangeCube.scale.set(2,2,2);
 scene.add(orangeCube);
 scene.add(bigOrangeCube);
 
-// create camera
+// ------------------------------------------create camera
 
 const sizes = {
     width:800,
@@ -41,7 +54,8 @@ const camera = new PerspectiveCamera(75, canvas.clientWidth/canvas.clientHeight)
 camera.position.z = 3;
 scene.add(camera);
 
-// thre renderer
+
+// --------------------------------------------three renderer
 const renderer = new WebGLRenderer({canvas});
 const pixelRat = Math.min(window.devicePixelRatio,2);
 renderer.setPixelRatio(pixelRat);
@@ -57,6 +71,35 @@ window.addEventListener('resize', () => {
 });
 
 
+//Controls using native threejs OrbitControls
+
+//const controls = new OrbitControls(camera, canvas);
+//controls.enableDamping = true;
+
+//Camera controls via camera-control lb
+
+const subsetOfTHREE = {
+    MOUSE,
+    Vector2,
+    Vector3,
+    Vector4,
+    Quaternion,
+    Matrix4,
+    Spherical,
+    Box3,
+    Sphere,
+    Raycaster,
+    MathUtils: {
+      DEG2RAD: MathUtils.DEG2RAD,
+      clamp: MathUtils.clamp
+    }
+  };
+
+  CameraControls.install( { THREE: subsetOfTHREE } ); 
+  const clock = new Clock();
+  const cameraControls = new CameraControls(camera,canvas);
+
+
 
 //animate
 
@@ -67,7 +110,11 @@ function animate(){
     bigOrangeCube.rotation.x +=-0.02;
     bigOrangeCube.rotation.z +=-0.02;
 
+    //controls.update();
+    const delta = clock.getDelta();
+    cameraControls.update(delta);
     renderer.render(scene,camera);
+
     requestAnimationFrame(animate);
 }
 
