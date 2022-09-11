@@ -28704,120 +28704,6 @@ class SphereGeometry extends BufferGeometry {
 
 }
 
-class MeshPhongMaterial extends Material {
-
-	constructor( parameters ) {
-
-		super();
-
-		this.isMeshPhongMaterial = true;
-
-		this.type = 'MeshPhongMaterial';
-
-		this.color = new Color( 0xffffff ); // diffuse
-		this.specular = new Color( 0x111111 );
-		this.shininess = 30;
-
-		this.map = null;
-
-		this.lightMap = null;
-		this.lightMapIntensity = 1.0;
-
-		this.aoMap = null;
-		this.aoMapIntensity = 1.0;
-
-		this.emissive = new Color( 0x000000 );
-		this.emissiveIntensity = 1.0;
-		this.emissiveMap = null;
-
-		this.bumpMap = null;
-		this.bumpScale = 1;
-
-		this.normalMap = null;
-		this.normalMapType = TangentSpaceNormalMap;
-		this.normalScale = new Vector2( 1, 1 );
-
-		this.displacementMap = null;
-		this.displacementScale = 1;
-		this.displacementBias = 0;
-
-		this.specularMap = null;
-
-		this.alphaMap = null;
-
-		this.envMap = null;
-		this.combine = MultiplyOperation;
-		this.reflectivity = 1;
-		this.refractionRatio = 0.98;
-
-		this.wireframe = false;
-		this.wireframeLinewidth = 1;
-		this.wireframeLinecap = 'round';
-		this.wireframeLinejoin = 'round';
-
-		this.flatShading = false;
-
-		this.fog = true;
-
-		this.setValues( parameters );
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.color.copy( source.color );
-		this.specular.copy( source.specular );
-		this.shininess = source.shininess;
-
-		this.map = source.map;
-
-		this.lightMap = source.lightMap;
-		this.lightMapIntensity = source.lightMapIntensity;
-
-		this.aoMap = source.aoMap;
-		this.aoMapIntensity = source.aoMapIntensity;
-
-		this.emissive.copy( source.emissive );
-		this.emissiveMap = source.emissiveMap;
-		this.emissiveIntensity = source.emissiveIntensity;
-
-		this.bumpMap = source.bumpMap;
-		this.bumpScale = source.bumpScale;
-
-		this.normalMap = source.normalMap;
-		this.normalMapType = source.normalMapType;
-		this.normalScale.copy( source.normalScale );
-
-		this.displacementMap = source.displacementMap;
-		this.displacementScale = source.displacementScale;
-		this.displacementBias = source.displacementBias;
-
-		this.specularMap = source.specularMap;
-
-		this.alphaMap = source.alphaMap;
-
-		this.envMap = source.envMap;
-		this.combine = source.combine;
-		this.reflectivity = source.reflectivity;
-		this.refractionRatio = source.refractionRatio;
-
-		this.wireframe = source.wireframe;
-		this.wireframeLinewidth = source.wireframeLinewidth;
-		this.wireframeLinecap = source.wireframeLinecap;
-		this.wireframeLinejoin = source.wireframeLinejoin;
-
-		this.flatShading = source.flatShading;
-
-		this.fog = source.fog;
-
-		return this;
-
-	}
-
-}
-
 const Cache = {
 
 	enabled: false,
@@ -31802,109 +31688,130 @@ function createBoundingSphere(object3d, out) {
 //1 scene
 
 const scene = new Scene();
-const canvas = document.getElementById('three-canvas');
+const canvas = document.getElementById("three-canvas");
 
 //2 cube
 
-const loader= new TextureLoader();
 
 
-const geometry = new BoxGeometry(1,0.5,0.5);
-const sphere = new SphereGeometry(0.5,0.01,0.01);
-const material = new MeshPhongMaterial({
-    //color: 0xff00ff,
-    specular: 0xffffff,
-    shininess:100,
-    flatshading:true,
-    map: loader.load('./logo.png')
-});
-new MeshPhongMaterial({
-    color: 0xff00ff,
-    specular: 0xffffff,
-    shininess:100,
-    flatshading:true
-});
-const materialBlue = new MeshBasicMaterial({color: 'blue'});
+const loadingManager = new LoadingManager();
+const loadingElem = document.querySelector("#loading");
+const progressBar = loadingElem.querySelector(".progressbar");
 
-const orangeCube = new Mesh(geometry,material);
+const images = [];
+for (let i = 0; i < 6; i++) {
+  images.push(`https://picsum.photos/200/300?random=${i}`);
+}
+
+const textureLoader = new TextureLoader(loadingManager);
+const materials = [
+    new MeshBasicMaterial({map: textureLoader.load(images[0])}),
+    new MeshBasicMaterial({map: textureLoader.load(images[1])}),
+    new MeshBasicMaterial({map: textureLoader.load(images[2])}),
+    new MeshBasicMaterial({map: textureLoader.load(images[3])}),
+    new MeshBasicMaterial({map: textureLoader.load(images[4])}),
+    new MeshBasicMaterial({map: textureLoader.load(images[5])}),
+];
+
+loadingManager.onLoad = ()=>{
+    loadingElem.style.display = 'none';
+    const cube = new Mesh(geometry,materials);
+    scene.add(cube);
+};
+
+loadingManager.onProgress = (urlOfLastItemLoaded, itemsLoaded, itemsTotal) =>{
+    const progress = itemsLoaded/ itemsTotal;
+    progressBar.style.transform = `scaleX(${progress})`;
+};
+
+
+
+const geometry = new BoxGeometry(1, 0.5, 0.5);
+new SphereGeometry(0.5, 0.01, 0.01);
+// const material = new MeshPhongMaterial({
+//   //color: 0xff00ff,
+//   specular: 0xffffff,
+//   shininess: 100,
+//   flatshading: true,
+//   map: loader.load("./logo.png"),
+// });
+
+const materialBlue = new MeshBasicMaterial({ color: "blue" });
+
+// const orangeCube = new Mesh(geometry, material);
 const bigOrangeCube = new Mesh(geometry, materialBlue);
-const sphereMesh = new Mesh(sphere,material);
-bigOrangeCube.position.x +=2;
-bigOrangeCube.scale.set(2,2,2);
+// const sphereMesh = new Mesh(sphere, material);
+bigOrangeCube.position.x += 2;
+bigOrangeCube.scale.set(2, 2, 2);
 //sphereMesh.scale.set(0.5,0.5,0.5);
 
-
-scene.add(orangeCube);
+// scene.add(orangeCube);
 scene.add(bigOrangeCube);
-scene.add(sphereMesh);
 
-const camera = new PerspectiveCamera(75, canvas.clientWidth/canvas.clientHeight);
+const camera = new PerspectiveCamera(
+  75,
+  canvas.clientWidth / canvas.clientHeight
+);
 camera.position.z = 3;
 scene.add(camera);
 
-
 // --------------------------------------------three renderer
-const renderer = new WebGLRenderer({canvas});
-const pixelRat = Math.min(window.devicePixelRatio,2);
+const renderer = new WebGLRenderer({ canvas });
+const pixelRat = Math.min(window.devicePixelRatio, 2);
 renderer.setPixelRatio(pixelRat);
-renderer.setSize(canvas.clientWidth,canvas.clientHeight,false);
+renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
 //renderer.render(scene,camera);
 
 //Lights
 
 const light1 = new DirectionalLight();
-light1.position.set(3,2,1,).normalize();
+light1.position.set(3, 2, 1).normalize();
 scene.add(light1);
 
 const light2 = new DirectionalLight();
-light2.position.set(-3,-2,-1,).normalize();
+light2.position.set(-3, -2, -1).normalize();
 scene.add(light2);
 
 //Camera
 
-window.addEventListener('resize', () => {
-    camera.aspect = canvas.clientWidth / canvas.clientHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+window.addEventListener("resize", () => {
+  camera.aspect = canvas.clientWidth / canvas.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
 });
-
 
 //Camera controls via camera-control lb
 
 const subsetOfTHREE = {
-    MOUSE,
-    Vector2,
-    Vector3,
-    Vector4,
-    Quaternion,
-    Matrix4,
-    Spherical,
-    Box3,
-    Sphere,
-    Raycaster,
-    MathUtils: {
-      DEG2RAD: MathUtils.DEG2RAD,
-      clamp: MathUtils.clamp
-    }
-  };
+  MOUSE,
+  Vector2,
+  Vector3,
+  Vector4,
+  Quaternion,
+  Matrix4,
+  Spherical,
+  Box3,
+  Sphere,
+  Raycaster,
+  MathUtils: {
+    DEG2RAD: MathUtils.DEG2RAD,
+    clamp: MathUtils.clamp,
+  },
+};
 
-  CameraControls.install( { THREE: subsetOfTHREE } ); 
-  const clock = new Clock();
-  const cameraControls = new CameraControls(camera,canvas);
-
-
+CameraControls.install({ THREE: subsetOfTHREE });
+const clock = new Clock();
+const cameraControls = new CameraControls(camera, canvas);
 
 //animate
 
-function animate(){
+function animate() {
+  //controls.update();
+  const delta = clock.getDelta();
+  cameraControls.update(delta);
+  renderer.render(scene, camera);
 
-
-    //controls.update();
-    const delta = clock.getDelta();
-    cameraControls.update(delta);
-    renderer.render(scene,camera);
-
-    requestAnimationFrame(animate);
+  requestAnimationFrame(animate);
 }
 
 animate();
