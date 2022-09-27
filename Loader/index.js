@@ -60,14 +60,23 @@ scene.add(grid);
 //2 the object
 
 const loader = new GLTFLoader();
+
+const loadingScreen = document.getElementById('loader-container');
+
+const progressText = document.getElementById('progress-text');
+
 loader.load('./link/police_station.glb',
 
 (gltf) => {
   scene.add(gltf.scene);
+  loadingScreen.classList.add('hidden');
 },
 
 (progress) => {
   console.log(progress);
+  const progrssPercent = progress.loaded / progress.total * 100;
+  const formatted = Math.trunc(progrssPercent);
+  progressText.textContent = `Loading: ${formatted}% `;
 },
 
 (error) => {
@@ -76,9 +85,6 @@ loader.load('./link/police_station.glb',
 
 );
 
-
-//video at 
-// https://youtu.be/NS2Wn8Z0WbA?t=473
 
 // ------------------------------------------create camera
 
@@ -101,7 +107,7 @@ const renderer = new WebGLRenderer({ canvas });
 const pixelRat = Math.min(window.devicePixelRatio, 2);
 renderer.setPixelRatio(pixelRat);
 renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
-renderer.setClearColor(0x555555,1);
+renderer.setClearColor(0xffffff,1);
 
 
 
@@ -111,11 +117,11 @@ const dirLight = new DirectionalLight();
 dirLight.position.set(3,2,1).normalize();
 scene.add(dirLight);
 
-// const ambLight = new AmbientLight( 0xFFFFFF,0.5);
-// scene.add(ambLight);
+const ambLight = new AmbientLight( 0xFFFFFF,0.5);
+scene.add(ambLight);
 
-const hemisphereLight = new HemisphereLight(0x70c2b4,0xff1453);
-scene.add(hemisphereLight);
+// const hemisphereLight = new HemisphereLight(0x70c2b4,0xff1453);
+// scene.add(hemisphereLight);
 
 //Camera
 
@@ -147,9 +153,8 @@ const subsetOfTHREE = {
 CameraControls.install({ THREE: subsetOfTHREE });
 const clock = new Clock();
 const cameraControls = new CameraControls(camera, canvas);
-
-//not working camera target ??? 
-//cameraControls.setTarget(box.x,box.y,box.z,false);
+cameraControls.dollyToCursor = true;
+cameraControls.setLookAt(18,20,18,0,10,0);
 
 //animate
 
