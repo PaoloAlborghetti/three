@@ -31827,7 +31827,7 @@ window.addEventListener('mousemove', (event)=>{
 
 
 function savePreviosSelection(item){
-  previosSelection.mesh = item.obitemject;
+  previosSelection.mesh = item.object;
   previosSelection.material = item.object.material;
 }
 
