@@ -27,6 +27,34 @@
 	margin: 20px;
 }
 
+.label{
+	background-color: rgba(255,255,255,0.6);
+	color: black;
+	font-size: 0.5em;
+	padding: 8px;
+	border-radius: 1rem;
+	backdrop-filter: blur(8px);
+	pointer-events: all;
+}
+
+.label-container{
+	pointer-events: all;
+	display:flex;
+	align-items: center;
+}
+
+.delete-button{
+	padding:6px;
+	border-radius: 1rem;
+	border:none;
+	margin-right: 1.5rem;
+	height: 1.5rem;
+}
+
+.delete-button{
+	cursor:pointer;
+}
+
 .hidden{
 	visibility:collapse ;
 }

@@ -60,31 +60,37 @@ scene.add(grid);
 
 //2 the object
 
-// const loader = new GLTFLoader();
 
-// const loadingScreen = document.getElementById("loader-container");
 
-// const progressText = document.getElementById("progress-text");
+const loader = new GLTFLoader();
 
-// loader.load(
-//   "./link/police_station.glb",
+const loadingScreen = document.getElementById("loader-container");
 
-//   (gltf) => {
-//     scene.add(gltf.scene);
-//     loadingScreen.classList.add("hidden");
-//   },
+const progressText = document.getElementById("progress-text");
 
-//   (progress) => {
-//     console.log(progress);
-//     const progrssPercent = (progress.loaded / progress.total) * 100;
-//     const formatted = Math.trunc(progrssPercent);
-//     progressText.textContent = `Loading: ${formatted}% `;
-//   },
+let policeStation;
 
-//   (error) => {
-//     console.log(error);
-//   }
-// );
+loader.load(
+  "./link/police_station.glb",
+
+  (gltf) => {
+    policeStation = gltf.scene;
+    scene.add(policeStation);
+    loadingScreen.classList.add("hidden");
+    
+  },
+
+  (progress) => {
+    console.log(progress);
+    const progrssPercent = (progress.loaded / progress.total) * 100;
+    const formatted = Math.trunc(progrssPercent);
+    progressText.textContent = `Loading: ${formatted}% `;
+  },
+
+  (error) => {
+    console.log(error);
+  }
+);
 
 // ------------------------------------------create camera
 
@@ -162,6 +168,59 @@ const clock = new Clock();
 const cameraControls = new CameraControls(camera, canvas);
 cameraControls.dollyToCursor = true;
 cameraControls.setLookAt(18, 20, 18, 0, 10, 0);
+
+//Picking
+
+const raycaster = new Raycaster();
+const mouse = new Vector2();
+
+
+window.addEventListener('dblclick', (event) => {
+	mouse.x = event.clientX / canvas.clientWidth * 2 - 1;
+	mouse.y = - (event.clientY / canvas.clientHeight) * 2 + 1;
+
+	raycaster.setFromCamera(mouse, camera);
+	const intersects = raycaster.intersectObject(policeStation);
+
+  if(!intersects.length) {
+    return;
+  };
+
+  const intersetionLocation = intersects[0].point;
+
+  const message = window.prompt('describe the issue:');
+
+  const container = document.createElement('div');
+  container.className= 'label-container';
+
+  const deleteButton = document.createElement('button');
+  deleteButton.textContent = 'X';
+  deleteButton.className = 'delete-button hidden';
+  container.appendChild(deleteButton);
+
+  deleteButton.onclick=()=>{
+    labelObject.removeFromParent();
+    labelObject.element = null;
+    container.remove();
+  }
+
+  const label = document.createElement('p');
+  label.textContent = message;
+  label.classList.add('label');
+  container.appendChild(label);
+
+  const labelObject = new CSS2DObject(container);
+  labelObject.position.copy(intersetionLocation);
+  scene.add(labelObject);
+
+  container.onmouseenter =()=> deleteButton.classList.remove('hidden');
+  container.onmouseleave =()=> deleteButton.classList.add('hidden');
+
+
+})
+
+
+
 
 //animate
 
